@@ -4,7 +4,7 @@
   "version": "1.1.0",
   "type": "privileged",
   "launch_path": "/index.html",
-  "developer": { "name": "Anemone", "url": "https://example.com" },
+  "developer": { "name": "Anemone", "url": "null" },
   "default_locale": "en",
   "icons": {
     "60": "/img/icon-60.png",
