@@ -13,6 +13,27 @@ var SD = (function () {
     return navigator.getDeviceStorage && navigator.getDeviceStorage('sdcard');
   }
 
+  // "/sdcard/Anemone/x" or "/sdcard1/Anemone/x" -> "Anemone/x"
+  function rel(name) {
+    return name.replace(/^\/?(?:sdcard\d*\/)?/, '');
+  }
+
+  // 'available' | 'unavailable' | 'shared' | 'none' (no API / no permission)
+  function state() {
+    return new Promise(function (res) {
+      var done = false;
+      function finish(v) { if (!done) { done = true; res(v); } }
+      try {
+        var s = storage();
+        if (!s) { return finish('none'); }
+        var r = s.available();
+        r.onsuccess = function () { finish(this.result); };
+        r.onerror = function () { finish('none'); };
+        setTimeout(function () { finish('none'); }, 3000);
+      } catch (e) { finish('none'); }
+    });
+  }
+
   function readFile(path) {
     return new Promise(function (res, rej) {
       var r = storage().get(path);
@@ -36,14 +57,14 @@ var SD = (function () {
 
   // Enumerate all files under a prefix and return their names.
   function list(prefix) {
-    return new Promise(function (res) {
+    return new Promise(function (res, rej) {
       var names = [];
       var cursor = storage().enumerate(prefix);
       cursor.onsuccess = function () {
         var f = this.result;
-        if (f) { names.push(f.name); this.continue(); } else { res(names); }
+        if (f) { names.push(f.name); this['continue'](); } else { res(names); }
       };
-      cursor.onerror = function () { res(names); };
+      cursor.onerror = function () { rej(this.error); };
     });
   }
 
@@ -52,11 +73,11 @@ var SD = (function () {
     return list(ROOT).then(function (names) {
       var manifests = names.filter(function (n) { return /\/theme\.json$/.test(n); });
       return Promise.all(manifests.map(function (m) {
-        var dir = m.replace(/theme\.json$/, '');
-        var rel = dir.replace(/^\/?(?:sdcard\/)?/, '');
-        return readJSON(rel + 'theme.json').then(function (meta) {
-          meta.dir = rel;
-          meta.files = names.filter(function (n) { return n.indexOf(dir) === 0; });
+        var dir = rel(m).replace(/theme\.json$/, '');
+        return readJSON(rel(m)).then(function (meta) {
+          meta.dir = dir;
+          // keep every path in the same relative form ("Anemone/<Theme>/...")
+          meta.files = names.map(rel).filter(function (n) { return n.indexOf(dir) === 0; });
           return meta;
         }).catch(function () { return null; });
       }));
@@ -65,5 +86,9 @@ var SD = (function () {
     });
   }
 
-  return { available: !!(navigator.getDeviceStorage), scan: scan, readFile: readFile, readJSON: readJSON, list: list };
+  return {
+    available: !!(navigator.getDeviceStorage),
+    state: state, scan: scan, rel: rel,
+    readFile: readFile, readJSON: readJSON, list: list
+  };
 })();

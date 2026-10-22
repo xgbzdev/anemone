@@ -1,9 +1,11 @@
 :root { --bg:#101820; --fg:#f2f5f7; --accent:#ff6f91; --card:#1c2733; }
-* { box-sizing: border-box; }
-body { margin:0; background:var(--bg); color:var(--fg); font-family: var(--anemone-font, sans-serif); }
+/* Gaia convention: 1rem = 10px, so the sizes below (1.6rem etc.) come out right */
+html { font-size: 10px; }
+* { box-sizing: border-box; -moz-box-sizing: border-box; }
+body { margin:0; font-size:1.6rem; background:var(--bg); color:var(--fg); font-family: var(--anemone-font, sans-serif); }
 header { display:flex; align-items:center; justify-content:space-between; padding:1rem; background:var(--card); }
 h1 { margin:0; font-size:2rem; color:var(--accent); }
-main, #detail { padding:1rem; }
+#main, #detail { padding:1rem; }
 button { background:var(--card); color:var(--fg); border:1px solid #3a4a5c; border-radius:.5rem; padding:.8rem 1.2rem; font-size:1.6rem; }
 button.primary { background:var(--accent); border-color:var(--accent); color:#101820; font-weight:bold; }
 #theme-list { list-style:none; margin:0; padding:0; }

@@ -12,11 +12,11 @@
     <button id="btn-rescan" aria-label="Rescan SD card">&#8635;</button>
   </header>
 
-  <main>
+  <div id="main">
     <p id="status">Looking for themes in <code>/sdcard/Anemone/</code>…</p>
     <ul id="theme-list"></ul>
     <button id="btn-stock" class="primary" hidden>Restore stock theme</button>
-  </main>
+  </div>
 
   <!-- Picker mode: used when the install can't read the SD card directly -->
   <section id="picker" hidden>
@@ -61,6 +61,7 @@
     </div>
   </div>
 
+  <script src="js/promise-polyfill.js"></script>
   <script src="js/permissions.js"></script>
   <script src="js/sdcard.js"></script>
   <script src="js/themer.js"></script>

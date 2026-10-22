@@ -1,14 +1,24 @@
 {
   "name": "Anemone",
   "description": "Theme manager",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "launch_path": "/index.html",
+  "origin": "app://anemone.themes",
   "icons": {
     "60": "/img/icon-60.png",
     "128": "/img/icon-128.png"
   },
   "developer": { "name": "Anemone" },
   "default_locale": "en",
-  "installs_allowed_from": ["*"],
-  "type": "web"
+  "type": "certified",
+  "permissions": {
+    "device-storage:sdcard": {
+      "description": "Read theme packs from the SD card",
+      "access": "readonly"
+    },
+    "settings": {
+      "description": "Apply wallpaper and theme settings",
+      "access": "readwrite"
+    }
+  }
 }

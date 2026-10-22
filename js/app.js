@@ -3,6 +3,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var themes = [];
   var current = null;
+  var previewUrls = [];
 
   function status(msg) { $('status').textContent = msg; }
 
@@ -30,8 +31,9 @@
     $('d-fonts').textContent = '';
     $('d-wallpaper').removeAttribute('src');
     $('detail').hidden = false;
-    document.querySelector('main').hidden = true;
+    $('main').hidden = true;
     Themer.preview(t).then(function (p) {
+      previewUrls = p.urls;
       if (p.wallpaper) { $('d-wallpaper').src = p.wallpaper; }
       p.icons.forEach(function (u) {
         var img = document.createElement('img');
@@ -39,19 +41,18 @@
         $('d-icons').appendChild(img);
       });
       $('d-fonts').textContent = p.fonts.length ? 'Fonts: ' + p.fonts.join(', ') : 'No fonts in this pack';
+    }).catch(function () {
+      $('d-fonts').textContent = 'Could not read this pack\'s files.';
     });
   }
 
   function closeDetail() {
+    Themer.release(previewUrls); previewUrls = [];
     $('detail').hidden = true;
-    document.querySelector('main').hidden = false;
+    $('main').hidden = false;
   }
 
   function scan() {
-    if (!SD.available) {
-      status('SD card access is not available on this device.');
-      return;
-    }
     status('Scanning SD card…');
     SD.scan().then(function (found) {
       themes = found;
@@ -61,23 +62,17 @@
     });
   }
 
-  // Can this install really read the SD card? (A plain web app can't.)
-  function probeSD(cb) {
-    var done = false;
-    function finish(v) { if (!done) { done = true; cb(v); } }
-    try {
-      var s = navigator.getDeviceStorage && navigator.getDeviceStorage('sdcard');
-      if (!s) { return finish(false); }
-      var r = s.available();
-      r.onsuccess = function () { finish(this.result === 'available'); };
-      r.onerror = function () { finish(false); };
-      setTimeout(function () { finish(false); }, 3000);
-    } catch (e) { finish(false); }
-  }
-
   function start() {
-    probeSD(function (ok) {
-      if (!ok) { startPicker(); return; }   // no SD access: use the file picker
+    SD.state().then(function (st) {
+      if (st === 'shared') {
+        status('The SD card is in use by USB storage. Unplug the cable and tap refresh.');
+        return;
+      }
+      if (st === 'unavailable') {
+        status('No SD card found. Insert one and tap refresh.');
+        return;
+      }
+      if (st !== 'available') { startPicker(); return; }   // no SD access: use the file picker
       Perms.ensure().then(function (allowed) {
         if (!allowed) { startPicker(); return; }
         scan();
