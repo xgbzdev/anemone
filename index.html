@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Anemone</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Anemone</h1>
+    <button id="btn-rescan" aria-label="Rescan SD card">&#8635;</button>
+  </header>
+
+  <main>
+    <p id="status">Looking for themes in <code>/sdcard/Anemone/</code>…</p>
+    <ul id="theme-list"></ul>
+    <button id="btn-stock" class="primary" hidden>Restore stock theme</button>
+  </main>
+
+  <section id="detail" hidden>
+    <h2 id="d-name"></h2>
+    <p id="d-author"></p>
+    <img id="d-wallpaper" alt="Wallpaper preview">
+    <div id="d-icons" class="icon-grid"></div>
+    <p id="d-fonts"></p>
+    <label><input type="checkbox" id="c-wall" checked> Wallpaper</label>
+    <label><input type="checkbox" id="c-icons" checked> Icons</label>
+    <label><input type="checkbox" id="c-fonts" checked> Fonts</label>
+    <div class="row">
+      <button id="btn-back">Back</button>
+      <button id="btn-apply" class="primary">Apply</button>
+    </div>
+  </section>
+
+  <!-- Permission popup -->
+  <div id="perm-popup" class="popup" hidden>
+    <div class="card">
+      <h2>Allow Anemone?</h2>
+      <p>To change your look, Anemone needs to:</p>
+      <ul>
+        <li><b>Read your SD card</b> to find theme packs</li>
+        <li><b>Change system settings</b> to set the wallpaper</li>
+        <li><b>List installed apps</b> to replace their icons</li>
+      </ul>
+      <p class="small">Android-style prompts from the OS may follow. You can revoke access in Settings &rsaquo; App Permissions.</p>
+      <div class="row">
+        <button id="perm-deny">Not now</button>
+        <button id="perm-allow" class="primary">Enable</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/permissions.js"></script>
+  <script src="js/sdcard.js"></script>
+  <script src="js/themer.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

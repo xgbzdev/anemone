@@ -1,0 +1,20 @@
+{
+  "name": "Anemone",
+  "description": "Theme manager: wallpaper, icons and fonts from your SD card",
+  "version": "1.0.0",
+  "type": "certified",
+  "launch_path": "/index.html",
+  "developer": { "name": "Anemone", "url": "https://example.com" },
+  "default_locale": "en",
+  "icons": {
+    "60": "/img/icon-60.png",
+    "128": "/img/icon-128.png"
+  },
+  "orientation": ["portrait-primary"],
+  "permissions": {
+    "device-storage:sdcard": { "access": "readonly", "description": "Read theme packs from the SD card" },
+    "settings": { "access": "readwrite", "description": "Apply wallpaper and theme settings" },
+    "webapps-manage": { "description": "List installed apps so icons can be themed" },
+    "themes": { "description": "Apply system themes" }
+  }
+}
