@@ -8,17 +8,15 @@
     "60": "/img/icon-60.png",
     "128": "/img/icon-128.png"
   },
-  "developer": { "name": "Anemone" },
+  "developer": {
+    "name": "Anemone"
+  },
   "default_locale": "en",
-  "type": "certified",
+  "type": "privileged",
   "permissions": {
     "device-storage:sdcard": {
       "description": "Read theme packs from the SD card",
       "access": "readonly"
-    },
-    "settings": {
-      "description": "Apply wallpaper and theme settings",
-      "access": "readwrite"
     }
   }
 }
