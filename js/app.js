@@ -61,13 +61,27 @@
     });
   }
 
+  // Can this install really read the SD card? (A plain web app can't.)
+  function probeSD(cb) {
+    var done = false;
+    function finish(v) { if (!done) { done = true; cb(v); } }
+    try {
+      var s = navigator.getDeviceStorage && navigator.getDeviceStorage('sdcard');
+      if (!s) { return finish(false); }
+      var r = s.available();
+      r.onsuccess = function () { finish(this.result === 'available'); };
+      r.onerror = function () { finish(false); };
+      setTimeout(function () { finish(false); }, 3000);
+    } catch (e) { finish(false); }
+  }
+
   function start() {
-    Perms.ensure().then(function (ok) {
-      if (!ok) {
-        status('Permissions are needed. Tap refresh to try again.');
-        return;
-      }
-      scan();
+    probeSD(function (ok) {
+      if (!ok) { startPicker(); return; }   // no SD access: use the file picker
+      Perms.ensure().then(function (allowed) {
+        if (!allowed) { startPicker(); return; }
+        scan();
+      });
     });
   }
 
@@ -106,7 +120,8 @@
 
   // ---- Picker mode (plain web install: no SD card API) ----
   function startPicker() {
-    status('Pick files from your SD card to preview them.');
+    status('This phone does not let Anemone browse the SD card, so choose files below.');
+    $('theme-list').innerHTML = '';
     $('picker').hidden = false;
     var fontUrl = null, wallUrl = null;
 
@@ -141,10 +156,6 @@
     };
   }
 
-  if (!SD.available) {
-    startPicker();
-  } else {
-    start();
-    refreshStockButton();
-  }
+  start();
+  refreshStockButton();
 })();
