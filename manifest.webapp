@@ -1,16 +1,13 @@
 {
   "name": "Anemone",
-  "description": "Theme manager: preview wallpapers and fonts from your SD card",
-  "version": "1.2.0",
+  "description": "Theme manager",
+  "version": "1.0.0",
   "launch_path": "/index.html",
   "icons": {
     "60": "/img/icon-60.png",
     "128": "/img/icon-128.png"
   },
-  "developer": {
-    "name": "Anemone",
-    "url": "https://example.com"
-  },
+  "developer": { "name": "Anemone" },
   "default_locale": "en",
   "installs_allowed_from": ["*"],
   "type": "web"
