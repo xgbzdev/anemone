@@ -18,6 +18,16 @@
     <button id="btn-stock" class="primary" hidden>Restore stock theme</button>
   </main>
 
+  <!-- Picker mode: used when the install can't read the SD card directly -->
+  <section id="picker" hidden>
+    <p class="small">This install can't browse your SD card, so pick files with your phone's file chooser instead.</p>
+    <label>Wallpaper <input type="file" id="p-wall" accept="image/*"></label>
+    <img id="p-wall-prev" alt="">
+    <label>Font <input type="file" id="p-font" accept=".ttf,.otf,.woff,.woff2"></label>
+    <p id="p-font-prev">The quick brown fox jumps over the lazy dog</p>
+    <button id="p-reset">Reset preview</button>
+  </section>
+
   <section id="detail" hidden>
     <h2 id="d-name"></h2>
     <p id="d-author"></p>

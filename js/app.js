@@ -104,6 +104,47 @@
     });
   };
 
-  start();
-  refreshStockButton();
+  // ---- Picker mode (plain web install: no SD card API) ----
+  function startPicker() {
+    status('Pick files from your SD card to preview them.');
+    $('picker').hidden = false;
+    var fontUrl = null, wallUrl = null;
+
+    $('p-wall').onchange = function () {
+      var f = this.files && this.files[0];
+      if (!f) { return; }
+      if (wallUrl) { URL.revokeObjectURL(wallUrl); }
+      wallUrl = URL.createObjectURL(f);
+      $('p-wall-prev').src = wallUrl;
+      document.body.style.backgroundImage = 'url(' + wallUrl + ')';
+      document.body.style.backgroundSize = 'cover';
+    };
+
+    $('p-font').onchange = function () {
+      var f = this.files && this.files[0];
+      if (!f) { return; }
+      if (fontUrl) { URL.revokeObjectURL(fontUrl); }
+      fontUrl = URL.createObjectURL(f);
+      var style = document.getElementById('anemone-fonts') || document.createElement('style');
+      style.id = 'anemone-fonts';
+      style.textContent = '@font-face{font-family:"AnemonePick";src:url(' + fontUrl + ');}';
+      document.head.appendChild(style);
+      document.documentElement.style.setProperty('--anemone-font', '"AnemonePick", sans-serif');
+    };
+
+    $('p-reset').onclick = function () {
+      document.body.style.backgroundImage = '';
+      document.documentElement.style.removeProperty('--anemone-font');
+      $('p-wall-prev').removeAttribute('src');
+      $('p-wall').value = '';
+      $('p-font').value = '';
+    };
+  }
+
+  if (!SD.available) {
+    startPicker();
+  } else {
+    start();
+    refreshStockButton();
+  }
 })();
