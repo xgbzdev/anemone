@@ -12,6 +12,7 @@ var Themer = (function () {
 
   function setSetting(key, value) {
     return new Promise(function (res, rej) {
+      if (!navigator.mozSettings) { return rej(new Error('not-allowed')); }
       var obj = {}; obj[key] = value;
       var r = navigator.mozSettings.createLock().set(obj);
       r.onsuccess = function () { res(); };
@@ -21,6 +22,7 @@ var Themer = (function () {
 
   function getSetting(key) {
     return new Promise(function (res) {
+      if (!navigator.mozSettings) { return res(null); }
       var r = navigator.mozSettings.createLock().get(key);
       r.onsuccess = function () {
         var v = this.result[key];
@@ -141,7 +143,24 @@ var Themer = (function () {
     if (opts.wallpaper) { jobs.push(applyWallpaper(theme)); }
     if (opts.icons) { jobs.push(applyIcons(theme)); }
     if (opts.fonts) { jobs.push(applyFonts(theme)); }
-    return backup().then(function () { return Promise.all(jobs); });
+    var names = [];
+    if (opts.wallpaper) { names.push('wallpaper'); }
+    if (opts.icons) { names.push('icons'); }
+    if (opts.fonts) { names.push('fonts'); }
+    var canSystem = !!navigator.mozSettings;
+    return backup().catch(function () {}).then(function () {
+      // Each job reports its own outcome so one denial doesn't hide the rest.
+      return Promise.all(jobs.map(function (job, i) {
+        return job.then(function (r) { return r; }, function () {
+          return names[i] + ' (blocked: needs a certified install)';
+        });
+      }));
+    }).then(function (results) {
+      if (!canSystem) {
+        results.push('note: system settings are unavailable in this install; fonts apply inside Anemone only');
+      }
+      return results;
+    });
   }
 
   // Preview helpers for the detail screen

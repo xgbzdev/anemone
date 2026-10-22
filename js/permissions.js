@@ -4,7 +4,7 @@ var Perms = (function () {
 
   function granted() { return localStorage.getItem('anemone.perms') === '1'; }
 
-  // Shows the popup; resolves true if the user taps Enable and the OS accepts.
+  // Shows the popup; resolves true if the user taps Enable and the SD card is reachable.
   function ensure() {
     return new Promise(function (resolve) {
       if (granted()) { return resolve(true); }
@@ -22,39 +22,26 @@ var Perms = (function () {
     });
   }
 
-  // Touching each API makes the OS raise its own permission prompt if needed.
+  // What this install is actually allowed to do (settings/apps are certified-only).
+  function caps() {
+    return {
+      sdcard: !!navigator.getDeviceStorage,
+      settings: !!navigator.mozSettings,
+      apps: !!(navigator.mozApps && navigator.mozApps.mgmt)
+    };
+  }
+
+  // Only the SD card is required. Settings and apps are optional extras:
+  // when this build is installed as privileged they simply aren't there.
   function requestOS() {
-    var checks = [];
-
     var sd = navigator.getDeviceStorage && navigator.getDeviceStorage('sdcard');
-    if (sd) {
-      checks.push(new Promise(function (res) {
-        var r = sd.available();
-        r.onsuccess = function () { res(this.result !== 'unavailable'); };
-        r.onerror = function () { res(false); };
-      }));
-    } else { checks.push(Promise.resolve(false)); }
-
-    if (navigator.mozSettings) {
-      checks.push(new Promise(function (res) {
-        var r = navigator.mozSettings.createLock().get('wallpaper.image');
-        r.onsuccess = function () { res(true); };
-        r.onerror = function () { res(false); };
-      }));
-    } else { checks.push(Promise.resolve(false)); }
-
-    if (navigator.mozApps && navigator.mozApps.mgmt) {
-      checks.push(new Promise(function (res) {
-        var r = navigator.mozApps.mgmt.getAll();
-        r.onsuccess = function () { res(true); };
-        r.onerror = function () { res(false); };
-      }));
-    } else { checks.push(Promise.resolve(false)); }
-
-    return Promise.all(checks).then(function (r) {
-      return r.every(Boolean);
+    if (!sd) { return Promise.resolve(false); }
+    return new Promise(function (res) {
+      var r = sd.available();
+      r.onsuccess = function () { res(this.result !== 'unavailable'); };
+      r.onerror = function () { res(false); };
     });
   }
 
-  return { ensure: ensure, granted: granted };
+  return { ensure: ensure, granted: granted, caps: caps };
 })();
